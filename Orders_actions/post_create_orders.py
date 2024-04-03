@@ -29,15 +29,7 @@ def create_orders(jwt_token):
         'Authorization1': jwt_token
     }
 
-    body = {
-        "actionTypeId": 1,
-        "awemeId": "7211120373851540742",
-        "shortLink": "",
-        "actionsAmount": 100,
-        "orderDurationHours": 12,
-        "orderName": "test",
-        "rewardId": None
-    }
+    body = TestData.ORDER_BODY
 
     response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.ORDERS_CREATE}', headers=headers, json=body)
     return print(f'Status code: {response.status_code}')
