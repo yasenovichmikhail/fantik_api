@@ -11,10 +11,6 @@ class LoginUsers:
         self.password = password
         self.sec_id = sec_id
 
-    def get_jwt_token(self, response):
-        for key, value in response.items():
-            return str(value)
-
     def login_users(self):
         body = {"tiktokAccountUsername": self.username,
                 "rawPassword": self.password,
@@ -23,5 +19,7 @@ class LoginUsers:
         headers = {'accept': 'application/json'}
 
         response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.USER_LOGIN_PATH}', headers=headers, json=body)
-        jwt_json = response.json()
-        return self.get_jwt_token(jwt_json)
+        return response.json()['jwt']
+
+
+l = LoginUsers(TestData.USER_NAME, TestData.PASSWORD, TestData.SEC_ID)

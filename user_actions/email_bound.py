@@ -2,6 +2,7 @@ import requests
 from config.config import TestData
 from user_actions.login_user import LoginUsers
 
+
 login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
 jwt_auth = login.login_users()
 

@@ -5,7 +5,6 @@ from user_actions.login_user import LoginUsers
 from pprint import *
 
 login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
-jwt_auth = login.login_users()
 
 
 def create_orders(jwt_token):
