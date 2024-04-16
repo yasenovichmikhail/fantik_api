@@ -8,11 +8,9 @@ from pprint import *
 
 def fetch_user_posts():
     body = {"username": "animalplanet",
-            "amount_of_posts": 20}
+            "amount_of_posts": 100}
 
-    headers = {'content-type': 'application/json',
-               'X-RapidAPI-Key': 'fd80dfa220msha1c05eac4a74483p10c016jsn711bd34e755a',
-               'X-RapidAPI-Host': 'tiktok-unauthorized-api-scraper-no-watermark-analytics-feed.p.rapidapi.com'}
+    headers = {'content-type': 'application/json'}
 
     response = requests.post(TestData.VIEWER_SEARCH_URL, headers=headers, json=body)
     return response
@@ -28,7 +26,6 @@ def fetch_posts_aweme_id(data):
 
 
 def create_fictive_order(aweme):
-
     body = {"actionTypeId": 1,
             "awemeId": aweme,
             "shortLink": "",
@@ -43,6 +40,7 @@ def create_fictive_order(aweme):
 
 t1 = time.perf_counter()
 data = fetch_user_posts().json()
+# pprint(data)
 
 aweme_list = []
 
@@ -52,8 +50,6 @@ fetch_posts_aweme_id(data)
 #     executor.map(create_fictive_order, aweme_list)
 
 print(aweme_list)
+print(len(aweme_list))
 t2 = time.perf_counter()
 print(f'Finished in {t2 - t1} second(s)')
-
-
-
