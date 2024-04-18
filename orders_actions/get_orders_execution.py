@@ -5,7 +5,6 @@ from pprint import *
 
 
 def get_orders_execution(jwt_token):
-
     headers = {
         'accept': 'application/json',
         'Authorization1': jwt_token
@@ -19,5 +18,3 @@ def get_orders_execution(jwt_token):
 login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
 jwt = login.login_users()
 get_orders_execution(jwt)
-
-

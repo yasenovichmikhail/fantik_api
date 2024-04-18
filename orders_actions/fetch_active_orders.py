@@ -6,7 +6,7 @@ import schedule
 from config.config import TestData
 
 
-conn = TestData.DB_PROD_CONNECTION
+conn = TestData.DB_CONNECTION
 
 active_orders_query = """select tuo.order_id
 from tm_order_execution_progresses toep
@@ -45,7 +45,7 @@ def job():
         send_msg(message)
 
 
-schedule.every(5).minutes.do(job)
+schedule.every(10).minutes.do(job)
 # schedule.every(5).to(10).days.do(job)
 # schedule.every().hour.do(job, message='things')
 # schedule.every().day.at("10:30").do(job)

@@ -22,4 +22,6 @@ class LoginUsers:
         return response.json()['jwt']
 
 
-l = LoginUsers(TestData.USER_NAME, TestData.PASSWORD, TestData.SEC_ID)
+if __name__ == '__main__':
+    l = LoginUsers(TestData.USER_NAME, TestData.PASSWORD, TestData.SEC_ID)
+    print(l.login_users())
