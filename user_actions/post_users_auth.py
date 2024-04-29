@@ -2,13 +2,13 @@ import requests
 import json
 from config.config import TestData
 from pprint import *
+from dataclasses import dataclass
 
 
+@dataclass()
 class UsersAuth:
-
-    def __init__(self, user_id, username):
-        self.user_id = user_id
-        self.username = username
+    user_id: int
+    username: str
 
     def user_auth(self):
         try:
