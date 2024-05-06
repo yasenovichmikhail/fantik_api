@@ -21,6 +21,7 @@ def create_orders(jwt_token):
         print(BaseException("Error occurred"))
 
 
-login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
-jwt = login.login_users()
-create_orders(jwt)
+if __name__ == '__main__':
+    login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
+    jwt = login.login_users()
+    create_orders(jwt)

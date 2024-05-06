@@ -1,6 +1,6 @@
 import requests
 import json
-from config.config import TestData
+from config.config import *
 from pprint import *
 from dataclasses import dataclass
 
@@ -26,8 +26,8 @@ class UsersAuth:
                 print(f'Status code: {response.status_code}', f'Forbidden', sep='\n')
             else:
                 print(f'Something went wrong, status code: {response.status_code}')
-        except:
-            BaseException("Error occurred")
+        except BaseExceptions:
+            print('Error occurred:\n', traceback.format_exc())
 
 
 user = UsersAuth(TestData.USER_ID, TestData.USER_NAME)

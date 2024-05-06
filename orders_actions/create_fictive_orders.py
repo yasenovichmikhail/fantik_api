@@ -2,18 +2,21 @@ import concurrent.futures
 import requests
 import time
 import json
-from config.config import TestData
+from config.config import *
 from pprint import *
 
 
 def fetch_user_posts():
-    body = {"username": "animalplanet",
-            "amount_of_posts": 100}
+    try:
+        body = {"username": "animalplanet",
+                "amount_of_posts": 500}
 
-    headers = {'content-type': 'application/json'}
+        headers = {'content-type': 'application/json'}
 
-    response = requests.post(TestData.VIEWER_SEARCH_URL, headers=headers, json=body)
-    return response
+        response = requests.post(TestData.VIEWER_SEARCH_URL, headers=headers, json=body)
+        return response
+    except BaseExceptions:
+        print('Error occurred:\n', traceback.format_exc())
 
 
 def fetch_posts_aweme_id(data):
@@ -49,7 +52,6 @@ fetch_posts_aweme_id(data)
 # with concurrent.futures.ThreadPoolExecutor() as executor:
 #     executor.map(create_fictive_order, aweme_list)
 
-print(aweme_list)
 print(len(aweme_list))
 t2 = time.perf_counter()
 print(f'Finished in {t2 - t1} second(s)')

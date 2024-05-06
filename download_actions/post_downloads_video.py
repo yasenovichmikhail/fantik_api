@@ -1,10 +1,10 @@
 import requests
-from config.config import *
+from config.config import TestData
 from user_actions.login_user import LoginUsers
 from pprint import *
 
 
-def referral_tokens(jwt_token):
+def post_download_videos(jwt_token):
     try:
         headers = {
             'accept': 'application/json',
@@ -12,19 +12,21 @@ def referral_tokens(jwt_token):
         }
 
         body = {
-            'usage_type': 'USER_REGISTRATION'
+            'postLink': TestData.POST_SHORT_LINK
         }
 
-        response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.REFERRAL_TOKENS_PATH}', headers=headers,
+        response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.DOWNLOAD_VIDEOS_PATH}', headers=headers,
                                  json=body)
         if response.status_code == 200:
+            print(f'Status code: {response.status_code}', sep='\n')
             pprint(response.json())
         else:
             print(f'Something went wrong, status code: {response.status_code}')
-    except BaseExceptions:
-        print('Error occurred:\n', traceback.format_exc())
+    except:
+        BaseException("Error occurred")
 
 
-login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
+login = LoginUsers(TestData.USER_NAME, TestData.PASSWORD, TestData.SEC_ID)
 jwt = login.login_users()
-referral_tokens(jwt)
+resp = post_download_videos(jwt)
+
