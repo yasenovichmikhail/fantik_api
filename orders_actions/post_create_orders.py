@@ -1,5 +1,5 @@
 import requests
-from config.config import TestData
+from config.config import *
 from user_actions.login_user import LoginUsers
 
 

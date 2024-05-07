@@ -1,19 +1,15 @@
 import concurrent.futures
-import requests
-import time
-import json
 from config.config import *
-from pprint import *
 
 
 def fetch_user_posts():
     try:
         body = {"username": "animalplanet",
-                "amount_of_posts": 500}
+                "amount_of_posts": 20}
 
         headers = {'content-type': 'application/json'}
 
-        response = requests.post(TestData.VIEWER_SEARCH_URL, headers=headers, json=body)
+        response = requests.post(TestData.VIEWER_SEARCH_BY_USERNAME_URL, headers=headers, json=body)
         return response
     except BaseExceptions:
         print('Error occurred:\n', traceback.format_exc())

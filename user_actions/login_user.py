@@ -1,8 +1,5 @@
-import requests
-import json
-from config.config import *
-from pprint import *
 from dataclasses import dataclass
+from config.config import *
 
 
 @dataclass
