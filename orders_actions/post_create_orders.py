@@ -3,7 +3,7 @@ from config.config import *
 from user_actions.login_user import LoginUsers
 
 
-def create_orders(jwt_token, action_type, aweme_id, amount):
+def create_orders(jwt_token, action_type, amount, aweme_id=None):
     try:
         headers = {
             'accept': 'application/json',
@@ -32,4 +32,4 @@ def create_orders(jwt_token, action_type, aweme_id, amount):
 if __name__ == '__main__':
     login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
     jwt = login.login_users()
-    create_orders(jwt, 1, TestData.AWEME_ID, 10)
+    create_orders(jwt_token=jwt, action_type=4, amount=10)

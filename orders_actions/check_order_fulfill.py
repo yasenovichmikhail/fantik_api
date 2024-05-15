@@ -4,9 +4,10 @@ from user_actions.login_user import LoginUsers
 import pandas as pd
 import schedule
 
+
 conn = TestData.DB_CONNECTION
-AMOUNT_BEFORE = 0
-AMOUNT_AFTER = 0
+amount_before = 0
+amount_after = 0
 FLAG = True
 
 
@@ -25,10 +26,26 @@ def fetch_post_data(aweme_id):
         print('Error occurred:\n', traceback.format_exc())
 
 
-def fetch_action_count(post_data, fetch_action):
+def fetch_user_data(username, amount_of_posts=0):
+    try:
+        body = {"username": username,
+                "amount_of_posts": amount_of_posts}
+
+        headers = {'content-type': 'application/json',
+                   'X-RapidAPI-Key': 'fd80dfa220msha1c05eac4a74483p10c016jsn711bd34e755a',
+                   'X-RapidAPI-Host': 'tiktok-unauthorized-api-scraper-no-watermark-analytics-feed.p.rapidapi.com'
+                   }
+
+        response = requests.post(TestData.VIEWER_SEARCH_BY_USERNAME_URL, headers=headers, json=body)
+        return response.json()
+    except BaseExceptions:
+        print('Error occurred:\n', traceback.format_exc())
+
+
+def fetch_action_count(post_data, type_info, fetch_action):
     try:
         for key, value in post_data.items():
-            if key == 'posts':
+            if key == type_info:
                 for key_play, value_play in value.items():
                     if key_play == fetch_action:
                         return value_play
@@ -36,10 +53,11 @@ def fetch_action_count(post_data, fetch_action):
         print('Error occurred:\n', traceback.format_exc())
 
 
-def create_message(amount_before, amount_after, order_id):
-    differance = amount_after - amount_before
-    text_message = f'Your order {order_id} was successfully completed. Amount before: {amount_before}, ' \
-                   f'amount after: {amount_after}. The difference was: {differance}'
+def create_message(action_type, before, after, order_id):
+    difference = after - before
+    text_message = f'Your order {order_id} for {TestData.ACTION_TYPES[action_type]} has been successfully completed.'\
+                   f'Amount before: {before}, ' \
+                   f'amount after: {after}. The difference was: {difference}'
     return text_message
 
 
@@ -51,13 +69,18 @@ def send_msg(text):
     print(results.json())
 
 
-def create_order(action_type, aweme_id, amount, fetch_action):
+def create_order(action_type,  amount, fetch_action, aweme_id=None):
+    global amount_before
     try:
         login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
         jwt = login.login_users()
-        create_orders(jwt, action_type, aweme_id, amount)
-        global AMOUNT_BEFORE
-        AMOUNT_BEFORE = fetch_action_count(post_data=fetch_post_data(aweme_id), fetch_action=fetch_action)
+        create_orders(jwt_token=jwt, action_type=action_type, amount=amount, aweme_id=aweme_id)
+        if action_type != 4:
+            amount_before = fetch_action_count(post_data=fetch_post_data(aweme_id), fetch_action=fetch_action,
+                                               type_info=TestData.POSTS_INFO)
+        elif action_type == 4:
+            amount_before = fetch_action_count(post_data=fetch_user_data(TestData.USER_NAME),
+                                               type_info=TestData.USER_INFO, fetch_action=fetch_action)
     except BaseExceptions:
         print('Error occurred:\n', traceback.format_exc())
 
@@ -84,25 +107,47 @@ def check_order_status(order_id):
     return order_status_id.iloc[0]['order_status_id']
 
 
-def job(action_type_id, aweme_id, fetch_action):
+def job(action_type_id, fetch_action, aweme_id=None):
+    global amount_after
     order_id = fetch_order_id(action_type_id)
-    order_status = check_order_status(fetch_order_id(action_type_id))
+    order_status = check_order_status(order_id=order_id)
     if order_status == 2:
-        global AMOUNT_AFTER
-        AMOUNT_AFTER = fetch_action_count(post_data=fetch_post_data(aweme_id),
-                                          fetch_action=fetch_action)
-        message = create_message(AMOUNT_BEFORE, AMOUNT_AFTER, order_id)
+        if action_type_id != 4:
+            amount_after = fetch_action_count(post_data=fetch_post_data(aweme_id),
+                                              fetch_action=fetch_action,
+                                              type_info=TestData.POSTS_INFO)
+        elif action_type_id == 4:
+            amount_after = fetch_action_count(post_data=fetch_user_data(TestData.USER_NAME),
+                                              type_info=TestData.USER_INFO, fetch_action=fetch_action)
+        message = create_message(action_type=action_type_id, before=amount_before,
+                                 after=amount_after, order_id=order_id)
         send_msg(message)
         global FLAG
         FLAG = False
 
 
-def create_and_check_order(action_type, aweme_id, amount, fetch_action):
-    create_order(action_type, aweme_id, amount, fetch_action)
-    schedule.every(10).minutes.do(job, action_type, aweme_id, fetch_action)
+def create_and_check_order(action_type, amount, fetch_action, aweme_id=None):
+    create_order(action_type=action_type, aweme_id=aweme_id, amount=amount, fetch_action=fetch_action)
+    schedule.every(1).minutes.do(job, action_type, aweme_id, fetch_action)
     while FLAG:
         schedule.run_pending()
 
 
-create_and_check_order(action_type=TestData.ACTION_TYPE_ID, aweme_id=TestData.AWEME_ID, amount=TestData.ORDER_AMOUNT,
-                       fetch_action=TestData.ACTION_TYPE_VIEWS)
+if __name__ == '__main__':
+    amount_before = fetch_action_count(post_data=fetch_user_data(TestData.USER_NAME),
+                                       type_info=TestData.USER_INFO, fetch_action=TestData.ACTION_TYPE_FOLLOWERS)
+    print(amount_before)
+    # create_and_check_order(action_type=4, amount=10,
+    #                        fetch_action=TestData.ACTION_TYPE_FOLLOWERS)
+    #
+    # create_and_check_order(action_type=1, aweme_id=TestData.AWEME_ID, amount=20,
+    #                        fetch_action=TestData.ACTION_TYPE_LIKES)
+
+    # followers = fetch_action_count(post_data=fetch_user_data(TestData.USER_NAME), type_info=TestData.USER_INFO,
+    #                                fetch_action=TestData.ACTION_TYPE_FOLLOWERS)
+    #
+    # likes = fetch_action_count(post_data=fetch_post_data(TestData.AWEME_ID), type_info=TestData.POSTS_INFO,
+    #                            fetch_action=TestData.ACTION_TYPE_LIKES)
+    #
+    # print(followers)
+    # print(likes)
