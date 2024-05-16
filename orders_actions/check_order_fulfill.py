@@ -55,9 +55,8 @@ def fetch_action_count(post_data, type_info, fetch_action):
 
 def create_message(action_type, before, after, order_id):
     difference = after - before
-    text_message = f'Your order {order_id} for {TestData.ACTION_TYPES[action_type]} has been successfully completed.'\
-                   f'Amount before: {before}, ' \
-                   f'amount after: {after}. The difference was: {difference}'
+    text_message = f'Your order {order_id} for {TestData.ACTION_TYPES_REF[action_type]} has been successfully ' \
+                   f'completed. Amount before: {before}, amount after: {after}. The difference was: {difference}'
     return text_message
 
 
@@ -78,9 +77,11 @@ def create_order(action_type,  amount, fetch_action, aweme_id=None):
         if action_type != 4:
             amount_before = fetch_action_count(post_data=fetch_post_data(aweme_id), fetch_action=fetch_action,
                                                type_info=TestData.POSTS_INFO)
+            print(f"{TestData.ACTION_TYPES_REF[action_type]} before: {amount_before}")
         elif action_type == 4:
             amount_before = fetch_action_count(post_data=fetch_user_data(TestData.USER_NAME),
                                                type_info=TestData.USER_INFO, fetch_action=fetch_action)
+            print(f"{TestData.ACTION_TYPES_REF[action_type]} before: {amount_before}")
     except BaseExceptions:
         print('Error occurred:\n', traceback.format_exc())
 
@@ -114,13 +115,18 @@ def job(action_type_id, fetch_action, aweme_id=None):
     if order_status == 2:
         if action_type_id != 4:
             amount_after = fetch_action_count(post_data=fetch_post_data(aweme_id),
-                                              fetch_action=fetch_action,
-                                              type_info=TestData.POSTS_INFO)
+                                              type_info=TestData.POSTS_INFO,
+                                              fetch_action=fetch_action)
+            print(f"{TestData.ACTION_TYPES_REF[action_type_id]} after: {amount_after}")
         elif action_type_id == 4:
             amount_after = fetch_action_count(post_data=fetch_user_data(TestData.USER_NAME),
-                                              type_info=TestData.USER_INFO, fetch_action=fetch_action)
-        message = create_message(action_type=action_type_id, before=amount_before,
-                                 after=amount_after, order_id=order_id)
+                                              type_info=TestData.USER_INFO,
+                                              fetch_action=fetch_action)
+            print(f"{TestData.ACTION_TYPES_REF[action_type_id]} after: {amount_after}")
+        message = create_message(action_type=action_type_id,
+                                 before=amount_before,
+                                 after=amount_after,
+                                 order_id=order_id)
         send_msg(message)
         global FLAG
         FLAG = False
@@ -128,18 +134,16 @@ def job(action_type_id, fetch_action, aweme_id=None):
 
 def create_and_check_order(action_type, amount, fetch_action, aweme_id=None):
     create_order(action_type=action_type, aweme_id=aweme_id, amount=amount, fetch_action=fetch_action)
-    schedule.every(1).minutes.do(job, action_type, aweme_id, fetch_action)
+    schedule.every(1).minutes.do(job, action_type_id=action_type, fetch_action=fetch_action, aweme_id=aweme_id)
     while FLAG:
         schedule.run_pending()
 
 
 if __name__ == '__main__':
-    amount_before = fetch_action_count(post_data=fetch_user_data(TestData.USER_NAME),
-                                       type_info=TestData.USER_INFO, fetch_action=TestData.ACTION_TYPE_FOLLOWERS)
-    print(amount_before)
-    # create_and_check_order(action_type=4, amount=10,
-    #                        fetch_action=TestData.ACTION_TYPE_FOLLOWERS)
-    #
+    create_and_check_order(action_type=4,
+                           amount=20,
+                           fetch_action=TestData.ACTION_TYPE_FOLLOWERS)
+
     # create_and_check_order(action_type=1, aweme_id=TestData.AWEME_ID, amount=20,
     #                        fetch_action=TestData.ACTION_TYPE_LIKES)
 
