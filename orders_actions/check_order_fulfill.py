@@ -140,18 +140,5 @@ def create_and_check_order(action_type, amount, fetch_action, aweme_id=None):
 
 
 if __name__ == '__main__':
-    create_and_check_order(action_type=4,
-                           amount=20,
-                           fetch_action=TestData.ACTION_TYPE_FOLLOWERS)
+    create_and_check_order(*TestData.FULFILL_ORDER_FORM[1])
 
-    # create_and_check_order(action_type=1, aweme_id=TestData.AWEME_ID, amount=20,
-    #                        fetch_action=TestData.ACTION_TYPE_LIKES)
-
-    # followers = fetch_action_count(post_data=fetch_user_data(TestData.USER_NAME), type_info=TestData.USER_INFO,
-    #                                fetch_action=TestData.ACTION_TYPE_FOLLOWERS)
-    #
-    # likes = fetch_action_count(post_data=fetch_post_data(TestData.AWEME_ID), type_info=TestData.POSTS_INFO,
-    #                            fetch_action=TestData.ACTION_TYPE_LIKES)
-    #
-    # print(followers)
-    # print(likes)
