@@ -1,5 +1,5 @@
 import requests
-from config.config import TestData
+from config.config import *
 from user_actions.login_user import LoginUsers
 from pprint import *
 
@@ -16,8 +16,8 @@ def get_download_videos(jwt_token):
             pprint(response.json())
         else:
             print(f'Something went wrong, status code: {response.status_code}')
-    except:
-        BaseException("Error occurred")
+    except BaseExceptions:
+        print('Error occurred:\n', traceback.format_exc())
 
 
 login = LoginUsers(TestData.USER_NAME, TestData.PASSWORD, TestData.SEC_ID)
