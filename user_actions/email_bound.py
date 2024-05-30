@@ -1,9 +1,9 @@
 import requests
-from config.config import TestData
+from config.config import *
 from user_actions.login_user import LoginUsers
 
 
-login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
+login = LoginUsers(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID)
 jwt_auth = login.login_users()
 
 
@@ -13,10 +13,10 @@ def email_bound_request(jwt_token):
     }
 
     body = {
-        'email': TestData.EMAIL
+        'email': EMAIL
     }
 
-    response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.POST_EMAIL_REQUEST_PATH}', headers=headers,
+    response = requests.post(f'{BASE_URL}' + f'{POST_EMAIL_REQUEST_PATH}', headers=headers,
                              json=body)
     key = response.json()['key']
     # print(f'Status code: {response.status_code}', key, sep='\n')
@@ -28,7 +28,7 @@ def email_bound_confirm(key):
         'key': key
     }
 
-    response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.POST_EMAIL_CONFIRM_PATH}', json=body)
+    response = requests.post(f'{BASE_URL}' + f'{POST_EMAIL_CONFIRM_PATH}', json=body)
     print(f'Status code: {response.status_code}', f'Your email has been changed successfully', sep='\n')
 
 

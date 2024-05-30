@@ -10,7 +10,7 @@ def get_download_videos(jwt_token):
             'accept': 'application/json',
             'Authorization1': jwt_token
         }
-        response = requests.get(f'{TestData.BASE_URL}' + f'{TestData.DOWNLOAD_VIDEOS_PATH}', headers=headers)
+        response = requests.get(f'{BASE_URL}' + f'{DOWNLOAD_VIDEOS_PATH}', headers=headers)
         if response.status_code == 200:
             print(f'Status code: {response.status_code}', sep='\n')
             pprint(response.json())
@@ -20,6 +20,6 @@ def get_download_videos(jwt_token):
         print('Error occurred:\n', traceback.format_exc())
 
 
-login = LoginUsers(TestData.USER_NAME, TestData.PASSWORD, TestData.SEC_ID)
+login = LoginUsers(USER_NAME, PASSWORD, SEC_ID)
 jwt = login.login_users()
 get_download_videos(jwt)

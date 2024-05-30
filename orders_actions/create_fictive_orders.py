@@ -12,7 +12,7 @@ def fetch_all_user_data(username, amount_of_posts):
                    'X-RapidAPI-Host': 'tiktok-unauthorized-api-scraper-no-watermark-analytics-feed.p.rapidapi.com'
                    }
 
-        response = requests.post(TestData.VIEWER_SEARCH_BY_USERNAME_FULL_URL, headers=headers, json=body)
+        response = requests.post(VIEWER_SEARCH_BY_USERNAME_FULL_URL, headers=headers, json=body)
         return response.json()
     except BaseExceptions:
         print('Error occurred:\n', traceback.format_exc())
@@ -36,12 +36,12 @@ def create_fictive_order(aweme):
             "orderName": "fictive",
             "rewardId": None}
 
-    response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.CREATE_FICTIVE_ORDERS_PATH}', json=body)
+    response = requests.post(f'{BASE_URL}' + f'{CREATE_FICTIVE_ORDERS_PATH}', json=body)
     return print(f'Status code: {response.status_code}')
 
 
 # t1 = time.perf_counter()
-data = fetch_all_user_data(TestData.USER_NAME, 20)
+data = fetch_all_user_data(USER_NAME, 20)
 pprint(data)
 
 aweme_list = []

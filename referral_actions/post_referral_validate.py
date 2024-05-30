@@ -13,9 +13,9 @@ def referral_validate(jwt_token):
             'Authorization1': jwt_token
         }
 
-        body = TestData.REFERRAL_TOKEN_BODY
+        body = REFERRAL_TOKEN_BODY
 
-        response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.REFERRAL_VALIDATE_PATH}', headers=headers,
+        response = requests.post(f'{BASE_URL}' + f'{REFERRAL_VALIDATE_PATH}', headers=headers,
                                  json=body)
         if response.status_code == 200:
             print(f'Status code: {response.status_code}', sep='\n')
@@ -32,6 +32,6 @@ def referral_validate(jwt_token):
         print('Error occurred:\n', traceback.format_exc())
 
 
-login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
+login = LoginUsers(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID)
 jwt = login.login_users()
 referral_validate(jwt)

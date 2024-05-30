@@ -1,5 +1,5 @@
 import requests
-from config.config import TestData
+from config.config import *
 from user_actions.login_user import LoginUsers
 from pprint import *
 
@@ -11,9 +11,9 @@ def post_deposits(jwt_token):
             'Authorization1': jwt_token
         }
 
-        body = TestData.DEPOSIT_BODY
+        body = DEPOSIT_BODY
 
-        response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.POST_DEPOSITS_PATH}', headers=headers,
+        response = requests.post(f'{BASE_URL}' + f'{POST_DEPOSITS_PATH}', headers=headers,
                                  json=body)
         if response.status_code == 200:
             print(f'Status code: {response.status_code}', sep='\n')
@@ -24,6 +24,6 @@ def post_deposits(jwt_token):
         BaseException("Error occurred")
 
 
-login = LoginUsers(TestData.USER_NAME, TestData.PASSWORD, TestData.SEC_ID)
+login = LoginUsers(USER_NAME, PASSWORD, SEC_ID)
 jwt = login.login_users()
 post_deposits(jwt)

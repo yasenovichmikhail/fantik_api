@@ -15,7 +15,7 @@ def referral_tokens(jwt_token):
             'usage_type': 'USER_REGISTRATION'
         }
 
-        response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.REFERRAL_TOKENS_PATH}', headers=headers,
+        response = requests.post(f'{BASE_URL}' + f'{REFERRAL_TOKENS_PATH}', headers=headers,
                                  json=body)
         if response.status_code == 200:
             pprint(response.json())
@@ -25,6 +25,6 @@ def referral_tokens(jwt_token):
         print('Error occurred:\n', traceback.format_exc())
 
 
-login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
+login = LoginUsers(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID)
 jwt = login.login_users()
 referral_tokens(jwt)

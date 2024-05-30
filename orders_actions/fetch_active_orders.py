@@ -3,10 +3,10 @@ import requests
 from sqlite3 import OperationalError
 import pandas as pd
 import schedule
-from config.config import TestData
+from config.config import *
 
 
-conn = TestData.DB_CONNECTION
+conn = DB_PROD_CONNECTION
 
 active_orders_query = """select tuo.order_id
 from tm_order_execution_progresses toep
@@ -14,7 +14,7 @@ from tm_order_execution_progresses toep
 where tuo.order_status_id = 1
   and tuo.is_fictive = 'false'
   and tuo.action_type_id != 5
-order by tuo.start_date asc"""
+order by tuo.start_date"""
 
 
 def execute_query(query, connect):
@@ -31,8 +31,8 @@ def create_message(amount):
 
 
 def send_msg(text):
-    token = TestData.TG_TOKEN
-    chat_id = TestData.TG_CHAT_ID
+    token = TG_TOKEN
+    chat_id = TG_CHAT_ID
     url_req = "https://api.telegram.org/bot" + token + "/sendMessage" + "?chat_id=" + chat_id + "&text=" + text
     results = requests.get(url_req)
     print(results.json())

@@ -20,7 +20,7 @@ def create_orders(jwt_token, action_type, amount, aweme_id=None):
             "rewardId": None
         }
 
-        response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.ORDERS_CREATE_PATH}', headers=headers, json=body)
+        response = requests.post(f'{BASE_URL}' + f'{ORDERS_CREATE_PATH}', headers=headers, json=body)
         if response.status_code == 200:
             print(f'Your order successfully created', f'Status code: {response.status_code}', sep='\n')
         else:
@@ -30,6 +30,7 @@ def create_orders(jwt_token, action_type, amount, aweme_id=None):
 
 
 if __name__ == '__main__':
-    login = LoginUsers(username=TestData.USER_NAME, password=TestData.PASSWORD, sec_id=TestData.SEC_ID)
+    login = LoginUsers(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID)
     jwt = login.login_users()
-    create_orders(jwt_token=jwt, action_type=4, amount=10)
+    for i in range(20):
+        create_orders(jwt_token=jwt, action_type=1, amount=10, aweme_id=AWEME_ID)

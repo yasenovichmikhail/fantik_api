@@ -16,7 +16,7 @@ class LoginUsers:
 
             headers = {'accept': 'application/json'}
 
-            response = requests.post(f'{TestData.BASE_URL}' + f'{TestData.USER_LOGIN_PATH}', headers=headers, json=body)
+            response = requests.post(f'{BASE_URL}' + f'{USER_LOGIN_PATH}', headers=headers, json=body)
             if response.status_code == 200:
                 print(f'User was successfully logged in', sep='\n')
                 return response.json()['jwt']
@@ -29,5 +29,5 @@ class LoginUsers:
 
 
 if __name__ == '__main__':
-    login = LoginUsers(TestData.USER_NAME, TestData.PASSWORD, TestData.SEC_ID)
+    login = LoginUsers(USER_NAME, PASSWORD, SEC_ID)
     print(login.login_users())
