@@ -3,9 +3,10 @@ from orders_actions.post_create_orders import create_orders
 from user_actions.login_user import LoginUsers
 import pandas as pd
 import schedule
+from multiprocessing import Process, Queue
 
 
-conn = TestData.DB_CONNECTION
+conn = TestData.DB_PROD_CONNECTION
 amount_before = 0
 amount_after = 0
 FLAG = True
@@ -140,5 +141,12 @@ def create_and_check_order(action_type, amount, fetch_action, aweme_id=None):
 
 
 if __name__ == '__main__':
-    create_and_check_order(*TestData.FULFILL_ORDER_FORM[1])
+    processes = []
+    for i in range(1, 6):
+        process = Process(target=create_and_check_order, args=(TestData.FULFILL_ORDER_FORM[i]))
+        processes.append(process)
+    for proc in processes:
+        proc.start()
+    for proc in processes:
+        proc.join()
 
