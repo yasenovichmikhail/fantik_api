@@ -142,7 +142,7 @@ def create_and_check_order(action_type, amount, fetch_action, aweme_id=None):
 
 if __name__ == '__main__':
     processes = []
-    for i in range(1, 6):
+    for i in [1, 2, 3, 5]:
         process = Process(target=create_and_check_order, args=(FULFILL_ORDER_FORM[i]))
         processes.append(process)
     for proc in processes:
