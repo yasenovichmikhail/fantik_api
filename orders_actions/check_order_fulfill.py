@@ -1,14 +1,18 @@
+import time
+
 from config.config import *
 from orders_actions.post_create_orders import create_orders
 from user_actions.login_user import LoginUsers
 import pandas as pd
 import schedule
-from multiprocessing import Process, Queue
-
+from multiprocessing import Process
+import threading
 
 conn = DB_PROD_CONNECTION
 amount_before = 0
 amount_after = 0
+time_before = 0
+time_after = 0
 FLAG = True
 
 
@@ -17,8 +21,8 @@ def fetch_post_data(aweme_id):
         body = {"aweme_id": aweme_id}
 
         headers = {'content-type': 'application/json',
-                  'X-RapidAPI-Key': 'fd80dfa220msha1c05eac4a74483p10c016jsn711bd34e755a',
-                  'X-RapidAPI-Host': 'tiktok-unauthorized-api-scraper-no-watermark-analytics-feed.p.rapidapi.com'}
+                   'X-RapidAPI-Key': 'fd80dfa220msha1c05eac4a74483p10c016jsn711bd34e755a',
+                   'X-RapidAPI-Host': 'tiktok-unauthorized-api-scraper-no-watermark-analytics-feed.p.rapidapi.com'}
 
         response = requests.post(VIEWER_SEARCH_BY_AWEME_ID_URL, headers=headers, json=body)
         return response.json()
@@ -54,10 +58,19 @@ def fetch_action_count(post_data, type_info, fetch_action):
         print('Error occurred:\n', traceback.format_exc())
 
 
-def create_message(action_type, before, after, order_id):
-    difference = after - before
-    text_message = f'Your order {order_id} for {ACTION_TYPES_REF[action_type]} has been successfully ' \
-                   f'completed. Amount before: {before}, amount after: {after}. The difference was: {difference}'
+def create_message(action_type, amount, metrics_before, metrics_after, order_id, time_before, time_after):
+    difference = metrics_after - metrics_before
+    diff = time_after - time_before
+    diff = time.gmtime(diff)
+    time_diff = time.strftime("%M min %S sec", diff)
+    if action_type != 5:
+        text_message = f'Your order {order_id} for {amount} {ACTION_TYPES_REF[action_type]} has been successfully ' \
+                       f'completed. Amount before: {metrics_before}, amount after: {metrics_after}.' \
+                       f'The difference is: {difference}. Finished in {time_diff}'
+    else:
+        text_message = f'Your order {order_id} for {amount}k {ACTION_TYPES_REF[action_type]} has been successfully ' \
+                       f'completed. Amount before: {metrics_before}, amount after: {metrics_after}.' \
+                       f'The difference is: {difference}. Finished in {time_diff}'
     return text_message
 
 
@@ -69,12 +82,14 @@ def send_msg(text):
     print(results.json())
 
 
-def create_order(action_type,  amount, fetch_action, aweme_id=None):
+def create_order(action_type, amount, fetch_action, aweme_id=None):
     global amount_before
+    global time_before
     try:
         login = LoginUsers(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID)
         jwt = login.login_users()
         create_orders(jwt_token=jwt, action_type=action_type, amount=amount, aweme_id=aweme_id)
+        time_before = time.perf_counter()
         if action_type != 4:
             amount_before = fetch_action_count(post_data=fetch_post_data(aweme_id), fetch_action=fetch_action,
                                                type_info=POSTS_INFO)
@@ -109,11 +124,13 @@ def check_order_status(order_id):
     return order_status_id.iloc[0]['order_status_id']
 
 
-def job(action_type_id, fetch_action, aweme_id=None):
+def job(action_type_id, fetch_action, amount, aweme_id=None):
     global amount_after
+    global time_after
     order_id = fetch_order_id(action_type_id)
     order_status = check_order_status(order_id=order_id)
     if order_status == 2:
+        time_after = time.perf_counter()
         if action_type_id != 4:
             amount_after = fetch_action_count(post_data=fetch_post_data(aweme_id),
                                               type_info=POSTS_INFO,
@@ -125,9 +142,12 @@ def job(action_type_id, fetch_action, aweme_id=None):
                                               fetch_action=fetch_action)
             print(f"{ACTION_TYPES_REF[action_type_id]} after: {amount_after}")
         message = create_message(action_type=action_type_id,
-                                 before=amount_before,
-                                 after=amount_after,
-                                 order_id=order_id)
+                                 metrics_before=amount_before,
+                                 metrics_after=amount_after,
+                                 order_id=order_id,
+                                 time_before=time_before,
+                                 time_after=time_after,
+                                 amount=amount)
         send_msg(message)
         global FLAG
         FLAG = False
@@ -135,7 +155,8 @@ def job(action_type_id, fetch_action, aweme_id=None):
 
 def create_and_check_order(action_type, amount, fetch_action, aweme_id=None):
     create_order(action_type=action_type, aweme_id=aweme_id, amount=amount, fetch_action=fetch_action)
-    schedule.every(1).minutes.do(job, action_type_id=action_type, fetch_action=fetch_action, aweme_id=aweme_id)
+    schedule.every(1).minutes.do(job, action_type_id=action_type, amount=amount, fetch_action=fetch_action,
+                                 aweme_id=aweme_id)
     while FLAG:
         schedule.run_pending()
 
@@ -144,8 +165,8 @@ if __name__ == '__main__':
     processes = []
     for i in [1, 2, 3, 5]:
         process = Process(target=create_and_check_order, args=(FULFILL_ORDER_FORM[i]))
+        process.start()
         processes.append(process)
-    for proc in processes:
-        proc.start()
+        time.sleep(1)
     for proc in processes:
         proc.join()
