@@ -17,7 +17,7 @@ for i in range(1, 5):                                                           
         if i != 4:
             create_orders(jwt_token=jwt,
                           action_type=i,
-                          amount=20,
+                          amount=50,
                           aweme_id=fetch_random_user_post(USER_NAME, 15))
         elif i == 4:
-            create_orders(jwt_token=jwt, action_type=i, amount=10)
+            create_orders(jwt_token=jwt, action_type=i, amount=50)
