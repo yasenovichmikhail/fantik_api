@@ -15,7 +15,7 @@ def create_orders(jwt_token, action_type, amount, aweme_id=None):
             "awemeId": aweme_id,
             "shortLink": None,
             "actionsAmount": amount,
-            "orderDurationHours": 0,
+            "orderDurationHours": 1,
             "orderName": "test",
             "rewardId": None
         }
@@ -32,5 +32,4 @@ def create_orders(jwt_token, action_type, amount, aweme_id=None):
 if __name__ == '__main__':
     login = LoginUsers(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID)
     jwt = login.login_users()
-    for i in range(20):
-        create_orders(jwt_token=jwt, action_type=1, amount=10, aweme_id=AWEME_ID)
+
