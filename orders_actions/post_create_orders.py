@@ -3,7 +3,7 @@ from config.config import *
 from user_actions.login_user import LoginUsers
 
 
-def create_orders(jwt_token, action_type, amount, aweme_id=None):
+def create_orders(jwt_token, action_type, amount, schema, aweme_id=None):
     try:
         headers = {
             'accept': 'application/json',
@@ -20,7 +20,7 @@ def create_orders(jwt_token, action_type, amount, aweme_id=None):
             "rewardId": None
         }
 
-        response = requests.post(f'{BASE_URL}' + f'{ORDERS_CREATE_PATH}', headers=headers, json=body)
+        response = requests.post(f'{schema}' + f'{ORDERS_CREATE_PATH}', headers=headers, json=body)
         if response.status_code == 200:
             print(f'Your order successfully created', f'Status code: {response.status_code}', sep='\n')
         else:
@@ -30,6 +30,10 @@ def create_orders(jwt_token, action_type, amount, aweme_id=None):
 
 
 if __name__ == '__main__':
-    login = LoginUsers(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID)
-    jwt = login.login_users()
+    def main(env):
+        login = LoginUsers(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID)
+        jwt = login.login_users(env=env)
+        create_orders(jwt_token=jwt, action_type=1, amount=10, schema=env)
+
+    main(BASE_URL_DEV)
 

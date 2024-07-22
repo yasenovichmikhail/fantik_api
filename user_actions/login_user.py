@@ -8,7 +8,7 @@ class LoginUsers:
     password: str
     sec_id: str
 
-    def login_users(self):
+    def login_users(self, env):
         try:
             body = {"tiktokAccountUsername": self.username,
                     "rawPassword": self.password,
@@ -16,7 +16,7 @@ class LoginUsers:
 
             headers = {'accept': 'application/json'}
 
-            response = requests.post(f'{BASE_URL}' + f'{USER_LOGIN_PATH}', headers=headers, json=body)
+            response = requests.post(f'{env}' + f'{USER_LOGIN_PATH}', headers=headers, json=body)
             if response.status_code == 200:
                 print(f'User was successfully logged in', sep='\n')
                 return response.json()['jwt']
@@ -30,4 +30,4 @@ class LoginUsers:
 
 if __name__ == '__main__':
     login = LoginUsers(USER_NAME, PASSWORD, SEC_ID)
-    print(login.login_users())
+    print(login.login_users(env=BASE_URL_DEV))
