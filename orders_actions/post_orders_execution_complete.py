@@ -1,9 +1,9 @@
 import requests
 from config.config import *
-from user_actions.login_user_dev import LoginUsers
+from user_actions.login_user import LoginUsers
 
 
-def orders_execution_complete(jwt_token, order_id, device_type=DEVICE_TYPE):
+def orders_execution_complete(jwt_token, order_id, base_url, device_type=DEVICE_TYPE):
     try:
         headers = {
             'accept': 'application/json',
@@ -20,20 +20,25 @@ def orders_execution_complete(jwt_token, order_id, device_type=DEVICE_TYPE):
             "isSkipped": False
         }
 
-        response = requests.post(f'{BASE_URL_DEV}' + f'{POST_ORDERS_EXECUTION_COMPLETE_PATH}',
+        response = requests.post(f'{base_url}' + f'{POST_ORDERS_EXECUTION_COMPLETE_PATH}',
                                  headers=headers, json=body)
         print(f'Status code: {response.status_code}')
     except BaseExceptions:
         print('Error occurred:\n', traceback.format_exc())
 
 
-def complete_orders(jwt_token, amount, order_id):
+def complete_orders(jwt_token, amount, order_id, base_url):
     for i in range(amount):
-        orders_execution_complete(jwt_token=jwt_token, order_id=order_id, device_type=DEVICE_TYPE)
+        orders_execution_complete(jwt_token=jwt_token, order_id=order_id, base_url=base_url)
+
+
+def main():
+    login = LoginUsers(username='psp',
+                       password='qwertyasd',
+                       sec_id='MS4wLjABAAAAfqnocaqWXSt7uMB39wpWj0u4DolsPbo6WJdayt6-vtY')
+    jwt = login.login_users(BASE_URL_DEV)
+    complete_orders(jwt, 10, 5561, base_url=BASE_URL_DEV)
 
 
 if __name__ == '__main__':
-    login = LoginUsers(username='klio', password='qwertyasd',
-                       sec_id='MS4wLjABAAAApS6u0PpUEzf8UwD32MAktyUQYKQO8s0GkpuxKNpkytPW9LteiX7Hx9RfCXwc034N')
-    jwt = login.login_users()
-    complete_orders(jwt, 9, 5454)
+    main()
