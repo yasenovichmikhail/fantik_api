@@ -82,16 +82,24 @@ def send_msg(text):
     print(results.json())
 
 
-def create_order(action_type, amount, fetch_action, aweme_id=None):
+def create_order(action_type, amount, duration, fetch_action, schema, aweme_id=None):
     global amount_before
     global time_before
     try:
-        login = LoginUsers(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID)
-        jwt = login.login_users()
-        create_orders(jwt_token=jwt, action_type=action_type, amount=amount, aweme_id=aweme_id)
+        login = LoginUsers(username=USER_NAME,
+                           password=PASSWORD,
+                           sec_id=SEC_ID)
+        jwt = login.login_users(schema)
+        create_orders(jwt_token=jwt,
+                      action_type=action_type,
+                      amount=amount,
+                      duration=duration,
+                      base_url=schema,
+                      aweme_id=aweme_id)
         time_before = time.perf_counter()
         if action_type != 4:
-            amount_before = fetch_action_count(post_data=fetch_post_data(aweme_id), fetch_action=fetch_action,
+            amount_before = fetch_action_count(post_data=fetch_post_data(aweme_id),
+                                               fetch_action=fetch_action,
                                                type_info=POSTS_INFO)
             print(f"{ACTION_TYPES_REF[action_type]} before: {amount_before}")
         elif action_type == 4:
@@ -153,9 +161,16 @@ def job(action_type_id, fetch_action, amount, aweme_id=None):
         FLAG = False
 
 
-def create_and_check_order(action_type, amount, fetch_action, aweme_id=None):
-    create_order(action_type=action_type, aweme_id=aweme_id, amount=amount, fetch_action=fetch_action)
-    schedule.every(1).minutes.do(job, action_type_id=action_type, amount=amount, fetch_action=fetch_action,
+def create_and_check_order(action_type, amount, duration, fetch_action, aweme_id=None, env=BASE_URL_DEV):
+    create_order(action_type=action_type,
+                 aweme_id=aweme_id,
+                 amount=amount,
+                 duration=duration,
+                 fetch_action=fetch_action,
+                 schema=env)
+    schedule.every(1).minutes.do(job, action_type_id=action_type,
+                                 amount=amount,
+                                 fetch_action=fetch_action,
                                  aweme_id=aweme_id)
     while FLAG:
         schedule.run_pending()
@@ -163,8 +178,8 @@ def create_and_check_order(action_type, amount, fetch_action, aweme_id=None):
 
 if __name__ == '__main__':
     processes = []
-    for i in [1, 2, 3, 5]:
-        process = Process(target=create_and_check_order, args=(FULFILL_ORDER_FORM[i]))
+    for i in [1, 2, 3, 4, 5]:
+        process = Process(target=create_and_check_order, args=(*FULFILL_ORDER_FORM[i], BASE_URL_PROD))
         process.start()
         processes.append(process)
         time.sleep(1)
