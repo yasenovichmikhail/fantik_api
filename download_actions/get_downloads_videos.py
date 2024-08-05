@@ -13,7 +13,6 @@ def get_download_videos(jwt_token, base_url):
         response = requests.get(f'{base_url}' + f'{DOWNLOAD_VIDEOS_PATH}', headers=headers)
         if response.status_code == 200:
             print(f'Status code: {response.status_code}', sep='\n')
-            pprint(response.json())
             return response.json()
         else:
             print(f'Something went wrong, status code: {response.status_code}')
@@ -21,10 +20,15 @@ def get_download_videos(jwt_token, base_url):
         print('Error occurred:\n', traceback.format_exc())
 
 
-login = LoginUsers('aaaaa75017', PASSWORD, 'MS4wLjABAAAADqkVdPXRX0PtK48xBSZK3iUM2SMnsdWONxyGJ1AR-uVok9Zu8bd9PYgUBAa5AA7l')
-jwt = login.login_users(BASE_URL_DEV)
-video = get_download_videos(jwt, BASE_URL_DEV)
-x = len(video['downloadVideoDtoList'])
-print(x)
-for value in video['downloadVideoDtoList']:
-    print(value)
+def main(username, password, sec_id, base_url):
+    login = LoginUsers(username=username,
+                       password=password,
+                       sec_id=sec_id)
+    jwt = login.login_users(base_url)
+    video = get_download_videos(jwt_token=jwt,
+                                base_url=base_url)
+    return pprint(video)
+
+
+if __name__ == '__main__':
+    main(username=USER_NAME, password=PASSWORD, sec_id=SEC_ID, base_url=BASE_URL_PROD)
