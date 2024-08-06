@@ -29,16 +29,26 @@ def orders_execution_complete(jwt_token, order_id, base_url, device_type=DEVICE_
 
 def complete_orders(jwt_token, amount, order_id, base_url):
     for i in range(amount):
-        orders_execution_complete(jwt_token=jwt_token, order_id=order_id, base_url=base_url)
+        orders_execution_complete(jwt_token=jwt_token,
+                                  order_id=order_id,
+                                  base_url=base_url)
 
 
-def main():
-    login = LoginUsers(username='psp',
-                       password='qwertyasd',
-                       sec_id='MS4wLjABAAAAfqnocaqWXSt7uMB39wpWj0u4DolsPbo6WJdayt6-vtY')
-    jwt = login.login_users(BASE_URL_DEV)
-    complete_orders(jwt, 10, 5561, base_url=BASE_URL_DEV)
+def main(username, password, sec_id, amount, order_id, base_url):
+    login = LoginUsers(username=username,
+                       password=password,
+                       sec_id=sec_id)
+    jwt = login.login_users(base_url)
+    complete_orders(jwt_token=jwt,
+                    amount=amount,
+                    order_id=order_id,
+                    base_url=base_url)
 
 
 if __name__ == '__main__':
-    main()
+    main(username=USER_NAME,
+         password=PASSWORD,
+         sec_id=SEC_ID,
+         amount=20,
+         order_id=5672,
+         base_url=BASE_URL_DEV)
