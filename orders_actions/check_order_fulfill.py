@@ -82,19 +82,19 @@ def send_msg(text):
     print(results.json())
 
 
-def create_order(action_type, amount, duration, fetch_action, schema, aweme_id=None):
+def create_order(action_type, amount, duration, fetch_action, base_url, aweme_id=None):
     global amount_before
     global time_before
     try:
         login = LoginUsers(username=USER_NAME,
                            password=PASSWORD,
                            sec_id=SEC_ID)
-        jwt = login.login_users(schema)
+        jwt = login.login_users(base_url)
         create_orders(jwt_token=jwt,
                       action_type=action_type,
                       amount=amount,
                       duration=duration,
-                      base_url=schema,
+                      base_url=base_url,
                       aweme_id=aweme_id)
         time_before = time.perf_counter()
         if action_type != 4:
@@ -161,13 +161,13 @@ def job(action_type_id, fetch_action, amount, aweme_id=None):
         FLAG = False
 
 
-def create_and_check_order(action_type, amount, duration, fetch_action, aweme_id=None, env=BASE_URL_DEV):
+def create_and_check_order(action_type, amount, duration, fetch_action, aweme_id=None, base_url=BASE_URL_DEV):
     create_order(action_type=action_type,
                  aweme_id=aweme_id,
                  amount=amount,
                  duration=duration,
                  fetch_action=fetch_action,
-                 schema=env)
+                 base_url=base_url)
     schedule.every(1).minutes.do(job, action_type_id=action_type,
                                  amount=amount,
                                  fetch_action=fetch_action,
