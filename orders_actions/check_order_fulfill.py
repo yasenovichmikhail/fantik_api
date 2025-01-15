@@ -37,11 +37,10 @@ def fetch_user_data(username, amount_of_posts=0):
                 "amount_of_posts": amount_of_posts}
 
         headers = {'content-type': 'application/json',
-                   'X-RapidAPI-Key': 'fd80dfa220msha1c05eac4a74483p10c016jsn711bd34e755a',
-                   'X-RapidAPI-Host': 'tiktok-unauthorized-api-scraper-no-watermark-analytics-feed.p.rapidapi.com'
+                   'accept': 'application/json'
                    }
 
-        response = requests.post(VIEWER_SEARCH_BY_USERNAME_URL, headers=headers, json=body)
+        response = requests.post(VIEWER_SEARCH_BY_USERNAME_PROD, headers=headers, json=body)
         return response.json()
     except BaseExceptions:
         print('Error occurred:\n', traceback.format_exc())
@@ -114,7 +113,7 @@ def fetch_order_id(action_type):
     select_active_order_id = f"""
     select order_id
     from tm_user_orders
-    where user_id = {USER_ID}
+    where owner_user_id = {USER_ID}
     and action_type_id = {action_type}
     order by order_id desc;
     """
